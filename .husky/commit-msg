@@ -1,0 +1,31 @@
+#!/bin/sh
+
+RED='\033[0;31m'
+NO_COLOR='\033[0m'
+
+invalid_messages=(
+  "${RED}Commit denied! Try 'feat:', 'fix:', etc.${NO_COLOR}"
+  "${RED}Oops! Format it right: 'feat:', 'fix:', etc.${NO_COLOR}"
+  "${RED}Wrong spell! Use 'feat:', 'fix:', etc.${NO_COLOR}"
+  "${RED}Uh-oh! Stick to 'feat:', 'fix:', etc.${NO_COLOR}"
+)
+
+long_messages=(
+  "${RED}Too long! Keep it under 88 chars.${NO_COLOR}"
+  "${RED}That's a novel, not a commit.${NO_COLOR}"
+  "${RED}Wordy! Aim for 88 chars or less.${NO_COLOR}"
+  "${RED}Edit please, it's over 88 chars.${NO_COLOR}"
+)
+
+invalid_msg=${invalid_messages[$RANDOM % ${#invalid_messages[@]}]}
+long_msg=${long_messages[$RANDOM % ${#long_messages[@]}]}
+
+if ! head -1 "$1" | grep -qE "^(feat|fix|ci|chore|docs|test|style|refactor|perf|build|revert)(\(.+?\))?: .{1,}$"; then
+  printf "%b\n" "$invalid_msg" >&2
+  exit 1
+fi
+
+if ! head -1 "$1" | grep -qE "^.{1,88}$"; then
+  printf "%b\n" "$long_msg" >&2
+  exit 1
+fi
